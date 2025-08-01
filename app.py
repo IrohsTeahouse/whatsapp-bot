@@ -17,7 +17,7 @@ conversations = {}
 orcamento_requests = {}
 
 # Número do tatuador (substitua pelo seu número real)
-TATUADOR_NUMERO = "whatsapp:+55S13991032680"
+TATUADOR_NUMERO = "whatsapp:+55S13978131504"
 # Senha simples para autenticação do tatuador
 TATUADOR_SENHA = "tatuador123"
 
@@ -299,8 +299,8 @@ def webhook():
         # Enviar solicitação de orçamento ao tatuador
         client.messages.create(
             body=f"Solicitação de orçamento:\nCliente: {from_number}\nIdeia: {state['data']['ideia']}\nTamanho/Local: {state['data']['tamanho_local']}\nPagamento: {state['data']['pagamento']}\nTatuador: {state['data']['tatuador']}\nImagem de referência: {state['data']['imagem']}\nPor favor, responda com o valor do orçamento.",
-            from_="whatsapp:+14155238886",
-            to="whatsapp:+55S13991032680"
+            from_="whatsapp:+8555948604",
+            to="whatsapp:+55S13978131504"
         )
         orcamento_requests[from_number] = from_number
         resp.message("Solicitei o orçamento ao tatuador. Aguarde a resposta para prosseguir!")
@@ -342,8 +342,8 @@ def webhook():
                 )
                 client.messages.create(
                     body=f"Cliente confirmou o agendamento:\nCliente: {from_number}\nIdeia: {state['data']['ideia']}\nTamanho/Local: {state['data']['tamanho_local']}\nPagamento: {state['data']['pagamento']}\nAgendado para: {slot}\nTatuador: {state['data']['tatuador']}\nOrçamento: {state['data']['orcamento']}\nImagem de referência: {state['data']['imagem']}",
-                    from_="whatsapp:+14155238886",
-                    to="whatsapp:+55S13991032680"
+                    from_="whatsapp:+8555948604",
+                    to="whatsapp:+55S13978131504"
                 )
             else:
                 resp.message("Escolha inválida. Diga 'oi' para começar de novo.")
