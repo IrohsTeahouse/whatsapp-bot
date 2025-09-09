@@ -3,3 +3,5 @@ venv/
 ngrok.exe
 __pycache__/
 *.pyc
+*.db
+*.csv
