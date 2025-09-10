@@ -178,18 +178,19 @@ def load_state(from_number):
 @app.route("/", methods=["GET"])
 def health_check():
     return "OK", 200
+
 @app.route("/webhook", methods=["POST"])
 def webhook():
     incoming_msg = request.values.get("Body", "").lower()
     from_number = request.values.get("From")
-    media_url = request.values.get("MediaUrl0", "")  # Validação: default vazio
+    media_url = request.values.get("MediaUrl0", "")
+    resp = MessagingResponse()
 
     # Opt-out para conformidade Meta
     if incoming_msg in ['pare', 'stop', 'cancelar', 'não']:
         save_state(from_number, {"step": 0, "data": {}})
-        return MessagingResponse().message("Mensagens canceladas. Para reativar, envie 'oi'.").to_xml()
-
-    resp = MessagingResponse()
+        resp.message("Mensagens canceladas. Para reativar, envie 'oi'.")
+        return str(resp)
 
     # Carrega state do DB
     state = load_state(from_number)
