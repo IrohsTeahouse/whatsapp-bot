@@ -59,7 +59,7 @@ def save_to_db(from_number, data, ):
     c = conn.cursor()
     consent = data.get('consent', 'Não informado')
     c.execute("INSERT OR REPLACE INTO clientes VALUES (?, ?, ?, ?, ?, ?)",
-              (from_number, data['ideia'], data['tamanho_local'], data['pagamento'], , consent))
+save_to_db(from_number, data['ideia'], data['tamanho_local'], data['pagamento'], consent)
     conn.commit()
     conn.close()
 
