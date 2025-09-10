@@ -194,26 +194,31 @@ def webhook():
 
         # Carrega state do DB
         state = load_state(from_number)
+        print(f"Estado carregado: {state}")  # Depuração do estado
 
         # Define se é o tatuador
         is_tatuador = from_number == TATUADOR_NUMERO
+        print(f"Verificando tatuador: from_number='{from_number}', TATUADOR_NUMERO='{TATUADOR_NUMERO}', is_tatuador={is_tatuador}")
 
         # Verifica se é o tatuador
         if is_tatuador:
             print(f"Verificando autenticação para {from_number}. Senha recebida: '{incoming_msg}', TATUADOR_SENHA: '{TATUADOR_SENHA}'")
-            print(f"Comparação: '{incoming_msg}' vs '{TATUADOR_SENHA.lower()}' - Estado: {state}")
+            print(f"Comparação: '{incoming_msg}' vs '{TATUADOR_SENHA.lower().strip()}' - Estado: {state}")
             if not state.get("autenticado", False):
                 if incoming_msg == TATUADOR_SENHA.lower().strip():  # Remove espaços e compara case-insensitive
                     state["autenticado"] = True
                     save_state(from_number, state)
+                    print(f"Autenticação bem-sucedida. Novo estado salvo: {state}")
                     resp.message("Acesso liberado! Digite 'ver agenda' para visualizar, 'adicionar agendamento' para incluir ou 'remover agendamento [número]'.")
                     return str(resp)
                 else:
+                    print(f"Autenticação falhou. Senha recebida: '{incoming_msg}', esperada: '{TATUADOR_SENHA.lower().strip()}'")
                     resp.message("Senha incorreta. Tente novamente.")
                     return str(resp)
             
             # Após autenticação, processa comandos
             if state.get("autenticado", False):
+                print(f"Processando comando como tatuador autenticado: '{incoming_msg}'")
                 if incoming_msg == "ver agenda":
                     agenda, agendamentos = visualizar_agenda(com_indices=True)
                     resp.message(agenda)
