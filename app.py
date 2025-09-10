@@ -179,6 +179,19 @@ def load_state(from_number):
 def health_check():
     return "OK", 200
 
+def load_state(from_number):
+    conn = sqlite3.connect('conversations.db')
+    c = conn.cursor()
+    # Criar tabela se não existir
+    c.execute('''CREATE TABLE IF NOT EXISTS conversations 
+                 (numero TEXT PRIMARY KEY, step INTEGER, data TEXT)''')
+    c.execute("SELECT step, data FROM conversations WHERE numero = ?", (from_number,))
+    row = c.fetchone()
+    conn.close()
+    if row:
+        return {"step": row[0], "data": json.loads(row[1]) if row[1] else {}}
+    return {"step": 0, "data": {}}
+
 @app.route("/webhook", methods=["POST"])
 def webhook():
     print(f"Recebido de {request.values.get('From', 'desconhecido')}: {request.values.get('Body', 'sem corpo')}")
@@ -187,15 +200,20 @@ def webhook():
     media_url = request.values.get("MediaUrl0", "")
     resp = MessagingResponse()
 
-    # Opt-out para conformidade Meta
-    if incoming_msg in ['pare', 'stop', 'cancelar', 'não']:
-        save_state(from_number, {"step": 0, "data": {}})
-        resp.message("Mensagens canceladas. Para reativar, envie 'oi'.")
-        return str(resp)
+    try:
+        # Opt-out para conformidade Meta
+        if incoming_msg in ['pare', 'stop', 'cancelar', 'não']:
+            save_state(from_number, {"step": 0, "data": {}})
+            resp.message("Mensagens canceladas. Para reativar, envie 'oi'.")
+            return str(resp)
 
-    # Carrega state do DB
-    state = load_state(from_number)
-    conversations[from_number] = state  # Cache temporário
+        # Carrega state do DB
+        state = load_state(from_number)
+        conversations[from_number] = state  # Cache temporário
+    except Exception as e:
+        print(f"Erro ao carregar state: {e}")
+        resp.message("Erro interno. Tente novamente mais tarde.")
+        return str(resp)
 
     # Verifica se é o tatuador
     is_tatuador = from_number == TATUADOR_NUMERO
