@@ -175,6 +175,9 @@ def load_state(from_number):
         return {"step": row[0], "data": json.loads(row[1]) if row[1] else {}, "autenticado": row[1] and 'autenticado' in json.loads(row[1])}
     return {"step": 0, "data": {}, "autenticado": False}
 
+@app.route("/", methods=["GET"])
+def health_check():
+    return "OK", 200
 @app.route("/webhook", methods=["POST"])
 def webhook():
     incoming_msg = request.values.get("Body", "").lower()
