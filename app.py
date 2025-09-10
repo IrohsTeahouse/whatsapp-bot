@@ -35,18 +35,19 @@ ES = {
 }
 
 # Inicializar banco de dados SQLite
+# Inicializar banco de dados SQLite
 def init_db():
     conn = sqlite3.connect('clientes.db')
     c = conn.cursor()
     c.execute('''CREATE TABLE IF NOT EXISTS clientes
-                 (numero TEXT PRIMARY KEY, ideia TEXT, tamanho_local TEXT, pagamento TEXT,  TEXT, consentimento TEXT)''')
+                 (numero TEXT PRIMARY KEY, ideia TEXT, tamanho_local TEXT, pagamento TEXT, data TEXT, consentimento TEXT)''')
     conn.commit()
     conn.close()
 
     conn = sqlite3.connect('agenda.db')
     c = conn.cursor()
     c.execute('''CREATE TABLE IF NOT EXISTS agenda
-                 (id INTEGER PRIMARY KEY AUTOINCREMENT, dia TEXT, horario TEXT, numero TEXT, ideia TEXT,  TEXT)''')
+                 (id INTEGER PRIMARY KEY AUTOINCREMENT, dia TEXT, horario TEXT, numero TEXT, ideia TEXT, status TEXT)''')
     c.execute('''CREATE TABLE IF NOT EXISTS conversations
                  (numero TEXT PRIMARY KEY, step INTEGER, data TEXT)''')  # data como JSON
     conn.commit()
@@ -64,12 +65,12 @@ def save_to_db(from_number, ideia, tamanho_local, pagamento, consent):
     conn.commit()
     conn.close()
 
-# Atualizar  no DB
-def update_(from_number, ):
+# Atualizar consentimento no DB
+def update_consent(from_number, consent):
     init_db()
     conn = sqlite3.connect('clientes.db')
     c = conn.cursor()
-    c.execute("UPDATE clientes SET  = ? WHERE numero = ? AND  = ''", (, from_number))
+    c.execute("UPDATE clientes SET consentimento = ? WHERE numero = ?", (consent, from_number))
     conn.commit()
     conn.close()
 
