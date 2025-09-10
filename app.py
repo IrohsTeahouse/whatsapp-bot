@@ -29,7 +29,7 @@ TATUADOR_NUMERO = "whatsapp:+5513978131504"
 BOT_NUMERO = "whatsapp:+5513991069988"
 
 # Descrição dos tatuadores
-TATUADORES = {
+ES = {
     "1": {"nome": "Lucas", "estilo": "Especialista em realismo e tatuagens detalhadas, ideal para retratos e desenhos complexos."},
     "2": {"nome": "Mariana", "estilo": "Focada em aquarela e traços delicados, perfeita para tatuagens coloridas e artísticas."}
 }
@@ -39,46 +39,46 @@ def init_db():
     conn = sqlite3.connect('clientes.db')
     c = conn.cursor()
     c.execute('''CREATE TABLE IF NOT EXISTS clientes
-                 (numero TEXT PRIMARY KEY, ideia TEXT, tamanho_local TEXT, pagamento TEXT, tatuador TEXT, consentimento TEXT)''')
+                 (numero TEXT PRIMARY KEY, ideia TEXT, tamanho_local TEXT, pagamento TEXT,  TEXT, consentimento TEXT)''')
     conn.commit()
     conn.close()
 
     conn = sqlite3.connect('agenda.db')
     c = conn.cursor()
     c.execute('''CREATE TABLE IF NOT EXISTS agenda
-                 (id INTEGER PRIMARY KEY AUTOINCREMENT, dia TEXT, horario TEXT, numero TEXT, ideia TEXT, tatuador TEXT)''')
+                 (id INTEGER PRIMARY KEY AUTOINCREMENT, dia TEXT, horario TEXT, numero TEXT, ideia TEXT,  TEXT)''')
     c.execute('''CREATE TABLE IF NOT EXISTS conversations
                  (numero TEXT PRIMARY KEY, step INTEGER, data TEXT)''')  # data como JSON
     conn.commit()
     conn.close()
 
 # Salvar dados do cliente (SQLite)
-def save_to_db(from_number, data, tatuador):
+def save_to_db(from_number, data, ):
     init_db()
     conn = sqlite3.connect('clientes.db')
     c = conn.cursor()
     consent = data.get('consent', 'Não informado')
     c.execute("INSERT OR REPLACE INTO clientes VALUES (?, ?, ?, ?, ?, ?)",
-              (from_number, data['ideia'], data['tamanho_local'], data['pagamento'], tatuador, consent))
+              (from_number, data['ideia'], data['tamanho_local'], data['pagamento'], , consent))
     conn.commit()
     conn.close()
 
-# Atualizar tatuador no DB
-def update_tatuador(from_number, tatuador):
+# Atualizar  no DB
+def update_(from_number, ):
     init_db()
     conn = sqlite3.connect('clientes.db')
     c = conn.cursor()
-    c.execute("UPDATE clientes SET tatuador = ? WHERE numero = ? AND tatuador = ''", (tatuador, from_number))
+    c.execute("UPDATE clientes SET  = ? WHERE numero = ? AND  = ''", (, from_number))
     conn.commit()
     conn.close()
 
 # Salvar agendamento (SQLite)
-def save_agendamento(from_number, data, dia, horario, tatuador):
+def save_agendamento(from_number, data, dia, horario, ):
     init_db()
     conn = sqlite3.connect('agenda.db')
     c = conn.cursor()
-    c.execute("INSERT INTO agenda (dia, horario, numero, ideia, tatuador) VALUES (?, ?, ?, ?, ?)",
-              (dia, horario, from_number, data['ideia'], tatuador))
+    c.execute("INSERT INTO agenda (dia, horario, numero, ideia, ) VALUES (?, ?, ?, ?, ?)",
+              (dia, horario, from_number, data['ideia'], ))
     conn.commit()
     conn.close()
 
@@ -118,10 +118,10 @@ def visualizar_agenda(com_indices=False):
         dia = row[1]
         if dia not in agenda:
             agenda[dia] = []
-        info = f"{row[2]} - {row[3]} ({row[4]}) - Tatuador: {row[5]}"
+        info = f"{row[2]} - {row[3]} ({row[4]}) - : {row[5]}"
         agenda[dia].append(info)
         agendamentos_lista.append({
-            'id': row[0], 'Dia': dia, 'Horario': row[2], 'Numero': row[3], 'Ideia': row[4], 'Tatuador': row[5]
+            'id': row[0], 'Dia': dia, 'Horario': row[2], 'Numero': row[3], 'Ideia': row[4], '': row[5]
         })
     
     if com_indices:
@@ -214,18 +214,18 @@ def webhook():
         # Verifica se é o tatuador
         is_tatuador = from_number == TATUADOR_NUMERO
 
-        if is_tatuador:
-            try:
-                # Autenticação
-                if not state.get("autenticado", False):
-                    if incoming_msg == TATUADOR_SENHA:
-                        state["autenticado"] = True
-                        save_state(from_number, state)
-                        resp.message("Acesso liberado! Digite 'ver agenda' para visualizar, 'adicionar agendamento' para incluir ou 'remover agendamento' para excluir.")
-                    else:
-                        resp.message("Senha incorreta. Tente novamente.")
-                    return str(resp)
-                # ... (resto do fluxo do tatuador)
+       if is_tatuador:
+    try:
+        print(f"Verificando autenticação para {from_number}. Senha recebida: '{incoming_msg}', TATUADOR_SENHA: '{TATUADOR_SENHA}'")
+        if not state.get("autenticado", False):
+            if incoming_msg == TATUADOR_SENHA.lower():  # Comparação case-insensitive
+                state["autenticado"] = True
+                save_state(from_number, state)
+                resp.message("Acesso liberado! Digite 'ver agenda' para visualizar, 'adicionar agendamento' para incluir ou 'remover agendamento' para excluir.")
+            else:
+                resp.message("Senha incorreta. Tente novamente.")
+            return str(resp)
+# ... (resto do fluxo do tatuador)
             except Exception as e:
                 print(f"Erro no fluxo do tatuador: {e}")
                 resp.message("Erro interno. Tente novamente.")
