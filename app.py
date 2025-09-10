@@ -196,52 +196,36 @@ def webhook():
         state = load_state(from_number)
 
         # Verifica se é o tatuador
-        is_tatuador = from_number == TATUADOR_NUMERO
-if is_tatuador:
-    print(f"Verificando autenticação para {from_number}. Senha recebida: '{incoming_msg}', TATUADOR_SENHA: '{TATUADOR_SENHA}'")
-    print(f"Comparação: '{incoming_msg}' vs '{TATUADOR_SENHA.lower()}' - Estado: {state}")
-    if not state.get("autenticado", False):
-        if incoming_msg == TATUADOR_SENHA.lower().strip():  # Remove espaços e compara case-insensitive
-            state["autenticado"] = True
-            save_state(from_number, state)
-            resp.message("Acesso liberado! Digite 'ver agenda' para visualizar, 'adicionar agendamento' para incluir ou 'remover agendamento [número]'.")
-            return str(resp)
-        else:
-            resp.message("Senha incorreta. Tente novamente.")
-            return str(resp)
-    
-    # Após autenticação, processa comandos
-    if state.get("autenticado", False):
-        if incoming_msg == "ver agenda":
-            agenda, agendamentos = visualizar_agenda(com_indices=True)
-            resp.message(agenda)
-            save_state(from_number, state)
-            return str(resp)
-        elif incoming_msg.startswith("remover agendamento"):
-            try:
-                indice = int(incoming_msg.split()[-1]) - 1 if len(incoming_msg.split()) > 1 else -1
-                _, agendamentos = visualizar_agenda(com_indices=True)
-                mensagem = remover_agendamento(indice, agendamentos)
-                resp.message(mensagem)
-                save_state(from_number, state)
-            except (ValueError, IndexError):
-                resp.message("Índice inválido. Use 'remover agendamento [número]' após ver a agenda.")
-            return str(resp)
-            elif state["step"] == 0 and from_number in orcamento_requests:
-                cliente_numero = orcamento_requests[from_number]
-                cliente_state = load_state(cliente_numero)
-                cliente_state["data"]["orcamento"] = incoming_msg
-                save_state(cliente_numero, cliente_state)
-                client.messages.create(
-                    body=f"O tatuador informou o orçamento: {incoming_msg}. Você aceita?\n1️⃣ Sim\n2️⃣ Não",
-                    from_=BOT_NUMERO,
-                    to=cliente_numero
-                )
-                cliente_state["step"] = 6
-                save_state(cliente_numero, cliente_state)
-                del orcamento_requests[from_number]
-                resp.message("Orçamento enviado ao cliente.")
-                return str(resp)
+        if is_tatuador:
+            print(f"Verificando autenticação para {from_number}. Senha recebida: '{incoming_msg}', TATUADOR_SENHA: '{TATUADOR_SENHA}'")
+            print(f"Comparação: '{incoming_msg}' vs '{TATUADOR_SENHA.lower()}' - Estado: {state}")
+            if not state.get("autenticado", False):
+                if incoming_msg == TATUADOR_SENHA.lower().strip():  # Remove espaços e compara case-insensitive
+                    state["autenticado"] = True
+                    save_state(from_number, state)
+                    resp.message("Acesso liberado! Digite 'ver agenda' para visualizar, 'adicionar agendamento' para incluir ou 'remover agendamento [número]'.")
+                    return str(resp)
+                else:
+                    resp.message("Senha incorreta. Tente novamente.")
+                    return str(resp)
+            
+            # Após autenticação, processa comandos
+            if state.get("autenticado", False):
+                if incoming_msg == "ver agenda":
+                    agenda, agendamentos = visualizar_agenda(com_indices=True)
+                    resp.message(agenda)
+                    save_state(from_number, state)
+                    return str(resp)
+                elif incoming_msg.startswith("remover agendamento"):
+                    try:
+                        indice = int(incoming_msg.split()[-1]) - 1 if len(incoming_msg.split()) > 1 else -1
+                        _, agendamentos = visualizar_agenda(com_indices=True)
+                        mensagem = remover_agendamento(indice, agendamentos)
+                        resp.message(mensagem)
+                        save_state(from_number, state)
+                    except (ValueError, IndexError):
+                        resp.message("Índice inválido. Use 'remover agendamento [número]' após ver a agenda.")
+                    return str(resp)
 
         # Fluxo do cliente
         if state["step"] == 0:
