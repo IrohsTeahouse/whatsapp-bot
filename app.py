@@ -399,5 +399,6 @@ def get_agenda():
     return visualizar_agenda()
 
 if __name__ == "__main__":
-    init_db()  # Inicializa DB na startup
-    app.run(host="0.0.0.0", port=int(os.getenv("PORT", 5000)))
+    init_db()  # Inicializa DB
+    port = int(os.getenv("PORT", 10000))  # Usa porta do Render (10000) como fallback
+    app.run(host="0.0.0.0", port=port)
