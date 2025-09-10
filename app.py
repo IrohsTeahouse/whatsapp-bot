@@ -35,7 +35,6 @@ ES = {
 }
 
 # Inicializar banco de dados SQLite
-# Inicializar banco de dados SQLite
 def init_db():
     conn = sqlite3.connect('clientes.db')
     c = conn.cursor()
@@ -49,7 +48,7 @@ def init_db():
     c.execute('''CREATE TABLE IF NOT EXISTS agenda
                  (id INTEGER PRIMARY KEY AUTOINCREMENT, dia TEXT, horario TEXT, numero TEXT, ideia TEXT, status TEXT)''')
     c.execute('''CREATE TABLE IF NOT EXISTS conversations
-                 (numero TEXT PRIMARY KEY, step INTEGER, data TEXT)''')  # data como JSON
+                 (numero TEXT PRIMARY KEY, step INTEGER, data TEXT, autenticado BOOLEAN DEFAULT 0)''')  # Adicionado autenticado
     conn.commit()
     conn.close()
 
