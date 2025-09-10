@@ -159,22 +159,23 @@ def remover_agendamento(indice, agendamentos_lista):
 # Salvar/load state (para persistência)
 def save_state(from_number, state):
     init_db()
-    conn = sqlite3.connect('agenda.db')  # Corrigido para agenda.db
+    conn = sqlite3.connect('agenda.db')
     c = conn.cursor()
-    c.execute("INSERT OR REPLACE INTO conversations (numero, step, data) VALUES (?, ?, ?)",
-              (from_number, state["step"], json.dumps(state.get("data", {}))))
+    # Salva step, data como JSON e autenticado como campo separado
+    c.execute("INSERT OR REPLACE INTO conversations (numero, step, data, autenticado) VALUES (?, ?, ?, ?)",
+              (from_number, state["step"], json.dumps(state.get("data", {})), state.get("autenticado", False)))
     conn.commit()
     conn.close()
 
 def load_state(from_number):
     init_db()
-    conn = sqlite3.connect('agenda.db')  # Corrigido para agenda.db
+    conn = sqlite3.connect('agenda.db')
     c = conn.cursor()
-    c.execute("SELECT step, data FROM conversations WHERE numero = ?", (from_number,))
+    c.execute("SELECT step, data, autenticado FROM conversations WHERE numero = ?", (from_number,))
     row = c.fetchone()
     conn.close()
     if row:
-        return {"step": row[0], "data": json.loads(row[1]) if row[1] else {}, "autenticado": row[1] and 'autenticado' in json.loads(row[1])}
+        return {"step": row[0], "data": json.loads(row[1]) if row[1] else {}, "autenticado": bool(row[2])}
     return {"step": 0, "data": {}, "autenticado": False}
 
 @app.route("/", methods=["GET"])
