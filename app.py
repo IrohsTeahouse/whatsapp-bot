@@ -238,10 +238,6 @@ def webhook():
             resp.message(agenda)
             save_state(from_number, state)
             return str(resp)
-        # ... (resto dos comandos do tatuador permanecem iguais, com save_state no final de cada)
-
-        # Exemplo para adicionar agendamento (adicione save_state no final de cada step tatuador)
-        # ... (código similar, com try/except em inputs)
 
     # Fluxo do cliente (com opt-in)
     if state["step"] == 0:
@@ -263,7 +259,7 @@ def webhook():
             save_state(from_number, state)
         return str(resp)
 
-elif state["step"] == 1:
+    elif state["step"] == 1:
         state["data"]["ideia"] = incoming_msg
         resp.message("Legal! Qual o tamanho aproximado (em cm) e onde você quer tatuar?")
         state["step"] = 2
