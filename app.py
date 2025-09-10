@@ -263,7 +263,7 @@ def webhook():
             save_state(from_number, state)
         return str(resp)
 
-    elif state["step"] == 1:
+    elif state["step"] = 1:
         state["data"]["ideia"] = incoming_msg
         resp.message("Legal! Qual o tamanho aproximado (em cm) e onde você quer tatuar?")
         state["step"] = 2
@@ -406,4 +406,3 @@ if __name__ == "__main__":
     init_db()  # Inicializa DB
     port = int(os.getenv("PORT", 5000))  # Usa 5000 como fallback, conforme erro sugere
     app.run(host="0.0.0.0", port=port, debug=False)  # debug=False para produção
-    app.run(host="0.0.0.0", port=port)
