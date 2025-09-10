@@ -263,7 +263,7 @@ def webhook():
             save_state(from_number, state)
         return str(resp)
 
-    elif state["step"] = 1:
+elif state["step"] == 1:
         state["data"]["ideia"] = incoming_msg
         resp.message("Legal! Qual o tamanho aproximado (em cm) e onde você quer tatuar?")
         state["step"] = 2
