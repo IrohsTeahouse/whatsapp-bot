@@ -181,6 +181,7 @@ def health_check():
 
 @app.route("/webhook", methods=["POST"])
 def webhook():
+    print(f"Recebido de {request.values.get('From', 'desconhecido')}: {request.values.get('Body', 'sem corpo')}")
     incoming_msg = request.values.get("Body", "").lower()
     from_number = request.values.get("From")
     media_url = request.values.get("MediaUrl0", "")
