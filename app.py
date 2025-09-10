@@ -53,13 +53,14 @@ def init_db():
     conn.close()
 
 # Salvar dados do cliente (SQLite)
-def save_to_db(from_number, data, ):
-    init_db()
+def save_to_db(from_number, ideia, tamanho_local, pagamento, consent):
     conn = sqlite3.connect('clientes.db')
     c = conn.cursor()
-    consent = data.get('consent', 'Não informado')
-    c.execute("INSERT OR REPLACE INTO clientes VALUES (?, ?, ?, ?, ?, ?)",
-save_to_db(from_number, data['ideia'], data['tamanho_local'], data['pagamento'], consent)
+    # Criar tabela se não existir
+    c.execute('''CREATE TABLE IF NOT EXISTS clientes 
+                 (numero TEXT PRIMARY KEY, ideia TEXT, tamanho_local TEXT, pagamento TEXT, consent TEXT, data TIMESTAMP)''')
+    c.execute("INSERT OR REPLACE INTO clientes VALUES (?, ?, ?, ?, ?, ?)", 
+              (from_number, ideia, tamanho_local, pagamento, consent, datetime.datetime.now()))
     conn.commit()
     conn.close()
 
