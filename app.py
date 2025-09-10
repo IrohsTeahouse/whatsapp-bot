@@ -400,5 +400,6 @@ def get_agenda():
 
 if __name__ == "__main__":
     init_db()  # Inicializa DB
-    port = int(os.getenv("PORT", 10000))  # Usa porta do Render (10000) como fallback
+    port = int(os.getenv("PORT", 5000))  # Usa 5000 como fallback, conforme erro sugere
+    app.run(host="0.0.0.0", port=port, debug=False)  # debug=False para produção
     app.run(host="0.0.0.0", port=port)
