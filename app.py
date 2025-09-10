@@ -189,8 +189,8 @@ def load_state(from_number):
     row = c.fetchone()
     conn.close()
     if row:
-        return {"step": row[0], "data": json.loads(row[1]) if row[1] else {}}
-    return {"step": 0, "data": {}}
+        return {"step": row[0], "data": json.loads(row[1]) if row[1] else {}, "autenticado": False if row[0] == 0 else row[1].get("autenticado", False)}
+    return {"step": 0, "data": {}, "autenticado": False}
 
 @app.route("/webhook", methods=["POST"])
 def webhook():
@@ -203,32 +203,37 @@ def webhook():
     try:
         # Opt-out para conformidade Meta
         if incoming_msg in ['pare', 'stop', 'cancelar', 'não']:
-            save_state(from_number, {"step": 0, "data": {}})
+            save_state(from_number, {"step": 0, "data": {}, "autenticado": False})
             resp.message("Mensagens canceladas. Para reativar, envie 'oi'.")
             return str(resp)
 
         # Carrega state do DB
         state = load_state(from_number)
         conversations[from_number] = state  # Cache temporário
+
+        # Verifica se é o tatuador
+        is_tatuador = from_number == TATUADOR_NUMERO
+
+        if is_tatuador:
+            try:
+                # Autenticação
+                if not state.get("autenticado", False):
+                    if incoming_msg == TATUADOR_SENHA:
+                        state["autenticado"] = True
+                        save_state(from_number, state)
+                        resp.message("Acesso liberado! Digite 'ver agenda' para visualizar, 'adicionar agendamento' para incluir ou 'remover agendamento' para excluir.")
+                    else:
+                        resp.message("Senha incorreta. Tente novamente.")
+                    return str(resp)
+                # ... (resto do fluxo do tatuador)
+            except Exception as e:
+                print(f"Erro no fluxo do tatuador: {e}")
+                resp.message("Erro interno. Tente novamente.")
+                return str(resp)
     except Exception as e:
-        print(f"Erro ao carregar state: {e}")
+        print(f"Erro geral: {e}")
         resp.message("Erro interno. Tente novamente mais tarde.")
         return str(resp)
-
-    # Verifica se é o tatuador
-    is_tatuador = from_number == TATUADOR_NUMERO
-
-    # Comandos do tatuador
-    if is_tatuador:
-        # Autenticação
-        if not state["autenticado"]:
-            if incoming_msg == TATUADOR_SENHA:
-                state["autenticado"] = True
-                save_state(from_number, state)
-                resp.message("Acesso liberado! Digite 'ver agenda' para visualizar, 'adicionar agendamento' para incluir ou 'remover agendamento' para excluir.")
-            else:
-                resp.message("Senha incorreta. Tente novamente.")
-            return str(resp)
 
         # Orçamento do tatuador
         if state["step"] == 0 and from_number in orcamento_requests:
