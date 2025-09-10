@@ -195,6 +195,9 @@ def webhook():
         # Carrega state do DB
         state = load_state(from_number)
 
+        # Define se é o tatuador
+        is_tatuador = from_number == TATUADOR_NUMERO
+
         # Verifica se é o tatuador
         if is_tatuador:
             print(f"Verificando autenticação para {from_number}. Senha recebida: '{incoming_msg}', TATUADOR_SENHA: '{TATUADOR_SENHA}'")
